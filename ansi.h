@@ -30,4 +30,12 @@
 #define tab     '\t'
 #define space   ' '
 
-#define esc         27
+#define esc     27
+#define del     127
+
+#define moveUp      "\x1b[1A"
+#define moveDown    "\x1b[1B"
+#define moveRight   "\x1b[1C"
+#define moveLeft    "\x1b[1D"
+
+#define clearLine   "\33[2K"
