@@ -23,10 +23,20 @@ typedef struct
     char ch;
 } PyCharObject;
 
+/*
 static PyObject* PyChar_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
+    PyCharObject* self;
+    self = (PyCharObject*) type->tp_alloc(type, 0);
+    if (self != NULL) {
+        self->ch = PyUnicode_FromString("");
+        if (self->ch == NULL) {
+            Py_DECREF(self);
+            return NULL;
+        }
     Py_RETURN_NONE;
 }
+*/
 
 static int PyChar_init(PyCharObject* self, PyObject* args)
 {
@@ -47,7 +57,7 @@ static PyObject* PyChar_string(PyTypeObject* type ,PyObject* self, PyObject* arg
 
 static PyMemberDef PyChar_members[] =
 {
-    {"string", T_OBJECT_EX, offsetof(PyCharObject, ch), 0,
+    {"string", T_OBJECT_EX, offsetof(PyCharObject, ch), 0, {"Convert PyCharObject to string"},
 
     {NULL}  /* Sentinel */
 };
@@ -58,12 +68,11 @@ static PyTypeObject CharType =
     .tp_name = "CLib.char",
     .tp_itemsize = 0,
     .tp_doc = PyDoc_STR("Char type for python"),
-    .tp_new = PyChar_new,
     .tp_init = (initproc)PyChar_init,
+    .tp_new = PyType_GenericNew,
     .tp_dealloc = (destructor)PyChar_dealloc,
 
-    .tp_members = PyChar_members
-
+    .tp_members = PyChar_members,
 };
 
 
