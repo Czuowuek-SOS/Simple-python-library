@@ -40,6 +40,11 @@ static PyObject* PyChar_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
 static int PyChar_init(PyCharObject* self, PyObject* args)
 {
+    if (!PyArg_ParseTuple(args, "c", &self->ch))
+    {
+        return -1;
+    }
+
     return 0;
 }
 
@@ -49,16 +54,27 @@ static void PyChar_dealloc(PyCharObject* self)
     Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
-static PyObject* PyChar_string(PyTypeObject* type ,PyObject* self, PyObject* args)
+static PyObject* PyChar_string(PyCharObject* self , PyObject* Py_UNUSED(ignored))
 {
-    Py_RETURN_NONE;
+    return PyUnicode_FromFormat("c", self->ch);
+}
+
+static PyObject* PyChar_ascii(PyCharObject* self , PyObject* Py_UNUSED(ignored))
+{
+    return PyLong_FromLong((int)self->ch);
 }
 
 
 static PyMemberDef PyChar_members[] =
 {
-    {"string", T_OBJECT_EX, offsetof(PyCharObject, ch), 0, {"Convert PyCharObject to string"},
+    {"ch", T_CHAR, offsetof(PyCharObject, ch), 0, "char"},
 
+    {NULL}  /* Sentinel */
+};
+
+static PyMethodDef PyChar_methods[] =
+{
+    {"string", (PyCFunction) PyChar_string, METH_NOARGS, "Return the string from ch "},
     {NULL}  /* Sentinel */
 };
 
@@ -67,12 +83,15 @@ static PyTypeObject CharType =
     PyVarObject_HEAD_INIT(NULL, 0)
     .tp_name = "CLib.char",
     .tp_itemsize = 0,
+    .tp_dealloc = (destructor)PyChar_dealloc,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
     .tp_doc = PyDoc_STR("Char type for python"),
+    .tp_methods = PyChar_methods,
+    .tp_members = PyChar_members,
     .tp_init = (initproc)PyChar_init,
     .tp_new = PyType_GenericNew,
-    .tp_dealloc = (destructor)PyChar_dealloc,
 
-    .tp_members = PyChar_members,
+
 };
 
 
